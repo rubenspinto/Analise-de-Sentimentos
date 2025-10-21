@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analisador de Sentimentos</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50 flex items-center justify-center min-h-screen">
+    <div class="max-w-md w-full bg-white shadow-md rounded-lg p-6">
+        <h1 class="text-xl font-semibold mb-4 text-center">Analisador de Sentimentos</h1>
+        <textarea id="texto" class="w-full h-28 border border-gray-300 rounded-lg p-2" placeholder="Digite seu texto aqui..."></textarea>
+        <button onclick="analisar()" class="mt-4 bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 w-full">Analisar</button>
+        <div id="resultado" class="mt-4 hidden p-4 rounded-lg"></div>
+    </div>
+
+    <script>
+        async function analisar() {
+            const texto = document.getElementById('texto').value;
+            if (!texto) {
+                alert('Digite algo para analisar.');
+                return;
+            }
+
+            const resposta = await fetch('http://localhost:7860/analisar', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({texto: texto})
+            });
+
+            if (resposta.ok) {
+                const resultado = await resposta.json();
+                const resultadoDiv = document.getElementById('resultado');
+                resultadoDiv.classList.remove('hidden');
+
+                resultadoDiv.innerHTML = `
+                    <p><strong>Texto:</strong> ${resultado.texto}</p>
+                    <p><strong>Sentimento:</strong> ${resultado.sentimento}</p>
+                    <p><strong>Confiança:</strong> ${resultado.confianca}</p>
+                `;
+
+                resultadoDiv.className = 'mt-4 p-4 rounded-lg text-white';
+                if (resultado.sentimento === 'Positive' ||
+                    resultado.sentimento === 'Very Positive' ) {
+                    resultadoDiv.classList.add('bg-green-500');
+                } else if (resultado.sentimento === 'Negative'
+                    || resultado.sentimento === 'Very Negative') {
+                    resultadoDiv.classList.add('bg-red-500');
+                } else {
+                    resultadoDiv.classList.add('bg-yellow-500');
+                }
+
+            } else {
+                alert('Erro ao analisar texto.');
+            }
+        }
+    </script>
+</body>
+</html>

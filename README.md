@@ -18,9 +18,4 @@ Este projeto usa um modelo para classificar textos como POSITIVO, NEGATIVO ou NE
 4. Após cerca de um minuto, acesse a URL abaixo:
 	```
 	http://localhost:7860/
-	```
-# Analise-de-Sentimentos
-# Analise-de-Sentimentos
-# Analise-de-Sentimentos
-# Analise-de-Sentimentos
-# Analise-de-Sentimentos
+

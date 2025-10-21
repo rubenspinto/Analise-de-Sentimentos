@@ -1,0 +1,9 @@
+version: '3.8'
+
+services:
+  sentiment-app:
+    build: .
+    container_name: sentiment-fastapi
+    ports:
+      - "7860:7860"
+    restart: unless-stopped

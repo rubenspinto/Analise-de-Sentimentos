@@ -1,0 +1,10 @@
+.idea/
+/.git/
+
+*.pyc
+__pycache__/
+*.env
+.venv/
+.huggingface.yaml
+
+.DS_Store
