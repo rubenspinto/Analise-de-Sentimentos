@@ -1,0 +1,4 @@
+,Acurácia,F1-Score,Latência Média (ms)
+TabularisAI (Multilingue),77.1%,0.794,155.65
+Nlptown (5 Estrelas),78.1%,0.803,195.47
+Pysentimiento (PT-BR),81.2%,0.825,170.72
