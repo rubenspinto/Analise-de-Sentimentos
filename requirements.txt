@@ -2,3 +2,6 @@ fastapi
 uvicorn[standard]
 transformers
 torch
+kagglehub
+pandas
+scikit-learn
