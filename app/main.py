@@ -1,18 +1,16 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, UploadFile, Request
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import FileResponse, JSONResponse
+from fastapi.responses import FileResponse, JSONResponse, HTMLResponse
 from fastapi.encoders import jsonable_encoder
 from pydantic import BaseModel
 from transformers import pipeline
+from starlette.background import BackgroundTask
 import kagglehub
 import os
 import pandas as pd
 import re
-from sklearn.metrics import accuracy_score
 
 
-# Baixando Dataset 
-path = kagglehub.dataset_download("augustop/portuguese-tweets-for-sentiment-analysis")
 
 app = FastAPI(title="API de Análise de Sentimentos")
 
@@ -28,59 +26,25 @@ app.add_middleware(
 modelo = pipeline("sentiment-analysis", model="pysentimiento/bertweet-pt-sentiment")
 
 # Funcões e Rotas
-# Função para limpar os textos
-def clean_text(text):
-    text = re.sub(r"http\S+", "", text)  # Remove URLs
-    text = re.sub(r"@\w+", "", text)    # Remove menções
-    text = re.sub(r"#\w+", "", text)    # Remove hashtags
-    text = re.sub(r"[^a-zA-Záéíóúçãõ ]", " ", text)  # Remove caracteres especiais
-    text = text.lower()  # Converte para minúsculas
-    return text
+def delete_file(path):
+    if os.path.exists(path):
+        os.remove(path)
 
-# Função de avalição dos datasets
-def avaliacaoDF():
-    # Ler o Arquivo dataset Tweet
-    # arquivo = pd.read_csv(os.path.join(path, "TweetsWithTheme.csv"))
-    # df = pd.DataFrame(arquivo)
-    # abrev = {"Positivo": "POS", "Negativo": "NEG"}
-    # df['sentimento'] = df["sentiment"].replace(abrev)
-
-    # Ler o Arquivo dataset Curso
-    df = pd.read_csv("app/dataset_comentarios_curso.csv")
-
-    # Ler o Arquivo dataset Prdouto
-    # df = pd.read_csv("app/dataset_comentarios_produto.csv")
-
-    #Limpa os textos dataset do Curso e Produto
-    df["texto_limpo"] = df["comentario"].apply(clean_text)
-
-    #Limpa os textos do dataset do Tweet
-    # df["texto_limpo"] = df["tweet_text"].apply(clean_text)
-
-    #Separando os textos e os labels
-    x_teste = df["texto_limpo"].head(1000)
-    x_teste_lista = x_teste.dropna().astype(str).tolist()
-    y_teste = df["sentimento"].head(1000)
+def avaliandoArquivo(df, textos):
+    # Separando os textos
+    x_campo = textos
+    x_campo_lista = x_campo.astype(str).tolist()
 
 
     # Fazendo a previsão do modelo
-    y_pred = list(modelo(x_teste_lista, batch_size=30))
-    predic = [r["label"] for r in y_pred]
+    y_pred_campo = list(modelo(x_campo_lista, batch_size=30))
+    predic_campo = [r["label"] for r in y_pred_campo]
 
-    # Criando DataFrame comparativo
-    comparacao = pd.DataFrame({
-        "texto": x_teste,
-        "sentimento_real": y_teste,
-        "sentimento_previsto": predic
-    })
 
-    # Filtrando erros
-    erros = comparacao[comparacao["sentimento_real"] != comparacao["sentimento_previsto"]]
+    df["Sentimento dos Alunos"] = predic_campo
 
-    #Avaliando a acurácia
-    acc = accuracy_score(y_teste, predic)
-    return  acc, erros
 
+    return df
 
 class TextoEntrada(BaseModel):
     texto: str
@@ -89,14 +53,45 @@ class TextoEntrada(BaseModel):
 @app.get("/")
 def frontend():
     return FileResponse("app/frontend.html")
+    
+@app.post("/analisar_arquivo")
+async def upload_planilha(file: UploadFile):
+    if not file.filename.endswith(".xlsx"):
+        return JSONResponse(content={"erro": "Formato inválido. Use xlsx."}, status_code=400)
 
-@app.get("/dados")
-async def dados():
+    os.makedirs("temp", exist_ok=True)
+    temp_path = os.path.join("temp", file.filename)
+    
     try:
-        acuracia, errosT = avaliacaoDF()
-        return JSONResponse(content={
-            "avaliacao": acuracia,
-            "erros": jsonable_encoder(errosT.head(10).to_dict(orient="records"))
-        })
+        # Salva o file temporariamente no disco
+        with open(temp_path, "wb") as f:
+            f.write(await file.read())
+
+        if file.filename.endswith(".xlsx"):
+            dfPlanilha = pd.read_excel(temp_path, skiprows=1, sheet_name=1)
+            textosAnalise = dfPlanilha["Qual sua mensagem, dica, sugestão ou crítica para o programa?"].fillna("Normal")
+
+            previsoes = avaliandoArquivo(dfPlanilha, textosAnalise)
+            output_path = "planilha_analisada.xlsx"
+            previsoes.to_excel(output_path, index=False)
+
+            task = BackgroundTask(delete_file, output_path)
+
+
+            response = FileResponse(
+                output_path, 
+                filename="planilha_analisada.xlsx", 
+                media_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+                background=task
+            )
+            response.set_cookie(key="downloadFinalizado", value="1")
+        return response
+
     except Exception as e:
-        return JSONResponse(content={"erro": str(e)}, status_code=500)
+        return JSONResponse(content={"erro": f"Erro ao salvar o arquivo: {str(e)}"}, status_code=500)
+    
+    finally:
+        # Remove o arquivo temporário
+        if os.path.exists(temp_path):
+            os.remove(temp_path)
+            os.rmdir("temp")

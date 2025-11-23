@@ -1,90 +1,98 @@
 <!DOCTYPE html>
 <html lang="pt-br">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Analisador de Sentimentos</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
+
 <body class="bg-gray-50 w-screen flex flex-col items-center min-h-screen">
     <div class="max-w-md w-lg h-max bg-white shadow-md rounded-lg p-6">
-        <h1 class="text-xl font-semibold mb-4 text-center">Avaliação dos datasets com o modelo Pysentimiento</h1>
-        <button onclick="analisar()" class="mt-4 bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 w-full">Analisar</button>
-        <div id="resultado" class="mt-4 hidden p-4 rounded-lg"></div>
+        <h1 class="text-xl font-semibold mb-4 text-center">Classificando os Sentimentos a partir dos arquivos</h1>
+        <form class=" flex flex-col" action="/analisar_arquivo" method="post" enctype="multipart/form-data">
+            <label for="file"
+                class="text-center bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 w-full">Enviar
+                Arquivo</label>
+            <input type="file" name="file" id="file" class="hidden">
+            <input type="submit" value="Analisar"
+                class="mt-4 bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 w-full">
+        </form>
     </div>
-    <div class="flex max-w-2xl justify-center items-center">
-        <div id="tabela" class="max-w-full w-full rounded-lg flex-wrap p-6"></div>
+    <div id="resultado"
+        class="w-full h-screen hidden z-0 absolute flex justify-center items-center space-x-4 opacity-80 bg-black p-4 rounded-lg">
+        <span class="bg-white w-5 h-5 opacity-1 rounded-full animate-bounce"></span>
+        <span class="bg-white w-5 h-5 rounded-full animate-bounce"></span>
+        <span class="bg-white w-5 h-5 rounded-full animate-bounce"></span>
     </div>
 
 
     <script>
-        async function analisar() {
-            
-            //Pegando o id das divs
-            const resultadoDiv = document.getElementById('resultado');
-            const tabelaDiv = document.getElementById('tabela')
+        // Seleção dos elementos do DOM usados pelo script
+        // - `form`: formulário que envia o arquivo para análise
+        // - `resultado`: overlay de carregamento que cobre a tela enquanto a análise ocorre
+        // - `spans`: três bolinhas que recebem animação visual de carregamento
+        const form = document.querySelector("form");
+        const resultado = document.getElementById("resultado");
+        const spans = resultado.querySelectorAll("span");
 
-            resultadoDiv.innerHTML = ""
-            tabelaDiv.innerHTML = ""
+        // Ao submeter o formulário, exibe o overlay de carregamento
+        // e aplica animações às bolinhas para indicar atividade.
+        form.addEventListener("submit", () => {
+            // Remove a classe `hidden` para mostrar o overlay
+            resultado.classList.remove("hidden");
 
-            //Adicionando texto de carregamento
-            resultadoDiv.classList.remove("hidden")
-            resultadoDiv.innerHTML = `<h3 class="text-center">Carregando...</h3>`
+            // Aplica a animação manualmente (sobrescreve classes CSS)
+            spans.forEach((span) => {
+                // Define a animação, duração e curva de aceleração
+                span.style.animation = "bounce .6s cubic-bezier(0.6, 0.1, 1, 0.4)";
+                // Faz a animação repetir indefinidamente
+                span.style.animationIterationCount = "infinite";
+                // Alterna a direção da animação a cada iteração
+                span.style.animationDirection = "alternate";
+            });
 
+            // Adiciona pequenos delays nas primeiras bolinhas para criar o efeito em sequência
+            spans[0].style.animationDelay = ".1s";
+            spans[1].style.animationDelay = ".2s";
 
-            const resposta = await fetch('http://localhost:7860/dados');
+            // Intervalo que verifica periodicamente se a operação terminou.
+            // A aplicação de backend deve definir um cookie `downloadFinalizado=1`
+            // quando a análise / download estiver completo.
+            const interval = setInterval(() => {
+                if (document.cookie.includes("downloadFinalizado=1")) {
+                    // Esconde o overlay quando o cookie é detectado
+                    resultado.classList.add("hidden");
 
-            if (resposta.ok) {
-                const resultado = await resposta.json();
+                    // Remove a animação das bolinhas para resetar o estado visual
+                    spans.forEach(span => span.style.animation = "none");
 
-                resultadoDiv.innerHTML = `
-                    <p><strong>Acurácia:</strong> ${resultado.avaliacao.toFixed(2)}</p>                  
-                `;
+                    // Limpa o intervalo para parar a verificação
+                    clearInterval(interval);
 
-                resultadoDiv.className = 'mt-4 p-4 rounded-lg text-white';
-                if (resultado.avaliacao >= 0.60) {
-                    resultadoDiv.classList.add('bg-green-500');
-                } else if (resultado.avaliacao < 0.50) {
-                    resultadoDiv.classList.add('bg-red-500');
-                } else {
-                    resultadoDiv.classList.add('bg-gray-500');
+                    // Remove o cookie limpando seu tempo de vida (max-age=0)
+                    document.cookie = "downloadFinalizado=1; max-age=0;";
                 }
+            }, 300); // checa a cada 300ms
+        });
 
-                let elementoTabela = document.createElement("table")
-                elementoTabela.className = "min-w-full border border-gray-300 rounded-lg text-md text-left";
 
-                let elementoThead = document.createElement("thead")
-                elementoThead.innerHTML = `
-                    <tr class="bg-gray-100 border-b">
-                        <th class="p-2 w-3/5 font-semibold">Texto</th>
-                        <th class="p-2 w-1/5 font-semibold">Sentimento Real</th>
-                        <th class="p-2 w-1/5 font-semibold">Sentimento Previsto</th>
-                    </tr>
-                `;
+        // Trata o evento `pageshow`, que é disparado quando a página é mostrada,
+        // incluindo quando é restaurada do bfcache (back-forward cache).
+        // Se `event.persisted` for true, a página veio do cache e devemos garantir
+        // que o overlay de carregamento esteja oculto e que as animações estejam resetadas.
+        window.addEventListener("pageshow", (event) => {
+            if (event.persisted) {
+                resultado.classList.add("hidden");
 
-                elementoTabela.append(elementoThead)
-                tabelaDiv.append(elementoTabela)
-
-                const elementoTbody = document.createElement("tbody")
-
-                resultado.erros.forEach(elem => {
-                    row = `
-                        <tr class="border-t">
-                            <td class="p-2">${elem.texto.slice(0, 100)}...</td>
-                            <td class="p-2">${elem.sentimento_real}</td>
-                            <td class="p-2">${elem.sentimento_previsto}</td>
-                        </tr>
-                    `
-                    elementoTbody.innerHTML += row
+                // Garante que nenhuma animação antiga permaneça ativa
+                spans.forEach(span => {
+                    span.style.animation = "none";
                 });
-                elementoTabela.appendChild(elementoTbody)
-                tabelaDiv.appendChild(elementoTabela)
-
             }
-            else{
-                resultadoDiv.innerHTML = `<h3>Erro ao carregar os dados</h3>`
-            }
-        }
+        });
     </script>
 </body>
+
 </html>
