@@ -2,7 +2,7 @@ fastapi
 uvicorn[standard]
 transformers
 torch
-kagglehub
 pandas
 python-multipart
 openpyxl
+odfpy

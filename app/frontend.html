@@ -13,11 +13,10 @@
         <h1 class="text-xl font-semibold mb-4 text-center">Classificando os Sentimentos a partir dos arquivos</h1>
         <form class=" flex flex-col" action="/analisar_arquivo" method="post" enctype="multipart/form-data">
             <label for="file"
-                class="text-center bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 w-full">Enviar
+                class="text-center font-medium bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600 w-full">Enviar
                 Arquivo</label>
             <input type="file" name="file" id="file" class="hidden">
-            <input type="submit" value="Analisar"
-                class="mt-4 bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 w-full">
+            <input type="submit" value="Analisar" class="mt-2 font-medium bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 w-full">
         </form>
     </div>
     <div id="resultado"
