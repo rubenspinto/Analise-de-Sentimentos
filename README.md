@@ -83,8 +83,8 @@ O modelo escolhido para produção foi o **Pysentimiento (BERTweet PT-BR)** apó
 1.  Formato do Arquivo: O sistema aceita apenas arquivos Excel (.xlsx).
 2.  Estrutura Obrigatória: A planilha deve conter os comentários na segunda aba (índice 1).
 3.  Coluna Alvo: O sistema busca automaticamente pela coluna com o cabeçalho exato:
-    > *"Qual sua mensagem, dica, sugestão ou crítica para o programa?"
-4.  **Resultado:** O download iniciará automaticamente com o arquivo `planilha_analisada.xlsx`, contendo a coluna extra **"Sentimento dos Alunos"**.
+    "Qual sua mensagem, dica, sugestão ou crítica para o programa?"
+4.  **Resultado: O download iniciará automaticamente com o arquivo `planilha_analisada.xlsx`, contendo a coluna extra "Sentimento dos Alunos".
 ```
 ---
 
