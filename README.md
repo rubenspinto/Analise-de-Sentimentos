@@ -6,17 +6,17 @@
 ![FastAPI](https://img.shields.io/badge/Backend-FastAPI-009688)
 ![Model](https://img.shields.io/badge/AI%20Model-BERTweet%20PT_BR-yellow)
 
-Este projeto é uma ferramenta de **Processamento de Linguagem Natural (NLP)** desenvolvida para a **Social Brasilis**. O sistema automatiza a classificação de feedbacks de alunos (Ciclo 2 e posteriores) em **POSITIVO**, **NEGATIVO** ou **NEUTRO**, agilizando a avaliação de impacto dos programas de formação.
+Este projeto é uma ferramenta de Processamento de Linguagem Natural (NLP) desenvolvida para a Social Brasilis. O sistema automatiza a classificação de feedbacks de alunos (Ciclo 2 e posteriores) em POSITIVO, NEGATIVO ou NEUTRO, agilizando a avaliação de impacto dos programas de formação.
 
 ---
 
 ## 📋| Funcionalidades
 
 ```
-* **Upload de Planilhas:** Interface web simples para envio de arquivos `.xlsx`.
-* **Classificação Automática:** Processamento em lote de comentários utilizando Deep Learning.
-* **Exportação de Resultados:** Gera uma cópia da planilha original com uma nova coluna de sentimentos classificados.
-* **Alta Precisão:** Modelo otimizado para a língua portuguesa (PT-BR) e linguagem informal/redes sociais.
+* Upload de Planilhas: Interface web simples para envio de arquivos `.xlsx`.
+* Classificação Automática: Processamento em lote de comentários utilizando Deep Learning.
+* Exportação de Resultados: Gera uma cópia da planilha original com uma nova coluna de sentimentos classificados.
+* Alta Precisão: Modelo otimizado para a língua portuguesa (PT-BR) e linguagem informal/redes sociais.
 ```
 
 ---
@@ -40,13 +40,13 @@ O modelo escolhido para produção foi o **Pysentimiento (BERTweet PT-BR)** apó
 ## 💻| Tecnologias Utilizadas
 
 ```
-* **Linguagem:** Python 3.10
-* **Framework Web:** FastAPI
-* **Containerização:** Docker & Docker Compose
-* **IA / NLP:** Transformers (Hugging Face), Pytorch
-* **Modelo Base:** `pysentimiento/bertweet-pt-sentiment`
-* **Processamento de Dados:** Pandas, OpenPyXL
-* **Frontend:** HTML5, TailwindCSS
+* Linguagem: Python 3.10
+* Framework Web: FastAPI
+* Containerização: Docker & Docker Compose
+* IA / NLP: Transformers (Hugging Face), Pytorch
+* Modelo Base: `pysentimiento/bertweet-pt-sentiment`
+* Processamento de Dados:** Pandas, OpenPyXL
+* Frontend: HTML5, TailwindCSS
 ```
 
 ---
@@ -58,21 +58,19 @@ O modelo escolhido para produção foi o **Pysentimiento (BERTweet PT-BR)** apó
 ```
 * [Docker](https://www.docker.com/) e Docker Compose instalados.
 
-### Passo a Passo
+ Passo a Passo
 
-1.  **Clone o repositório:**
-    ```bash
+1.  Clone o repositório:
+    
     git clone [https://github.com/rubenspinto/Analise-de-Sentimentos.git](https://github.com/rubenspinto/Analise-de-Sentimentos.git)
     cd Analise-de-Sentimentos
-    ```
 
-2.  **Suba o ambiente com Docker Compose:**
+2.  Suba o ambiente com Docker Compose:
     Este comando irá construir a imagem e iniciar o servidor na porta 7860.
-    ```bash
+    
     docker-compose up -d --build
-    ```
 
-3.  **Acesse a Aplicação:**
+3.  Acesse a Aplicação:
     Abra o navegador e vá para:
     `http://localhost:7860/`
 ```
@@ -82,10 +80,10 @@ O modelo escolhido para produção foi o **Pysentimiento (BERTweet PT-BR)** apó
 ## 📝| Guia de Utilização
 
 ```
-1.  **Formato do Arquivo:** O sistema aceita apenas arquivos **Excel (.xlsx)**.
-2.  **Estrutura Obrigatória:** A planilha deve conter os comentários na **segunda aba** (índice 1).
-3.  **Coluna Alvo:** O sistema busca automaticamente pela coluna com o cabeçalho exato:
-    > *"Qual sua mensagem, dica, sugestão ou crítica para o programa?"*
+1.  Formato do Arquivo: O sistema aceita apenas arquivos Excel (.xlsx).
+2.  Estrutura Obrigatória: A planilha deve conter os comentários na segunda aba (índice 1).
+3.  Coluna Alvo: O sistema busca automaticamente pela coluna com o cabeçalho exato:
+    > *"Qual sua mensagem, dica, sugestão ou crítica para o programa?"
 4.  **Resultado:** O download iniciará automaticamente com o arquivo `planilha_analisada.xlsx`, contendo a coluna extra **"Sentimento dos Alunos"**.
 ```
 ---
@@ -93,7 +91,7 @@ O modelo escolhido para produção foi o **Pysentimiento (BERTweet PT-BR)** apó
 ## 🗂️| Estrutura do Projeto
 
 ```
-  ├── app/ │ 
+  ├── app/
   ├── main.py # Lógica principal da API e Modelo IA 
   │ └── frontend.html # Interface do usuário 
   ├── Dockerfile # Configuração da imagem Docker 
@@ -106,15 +104,15 @@ O modelo escolhido para produção foi o **Pysentimiento (BERTweet PT-BR)** apó
 
 ## 👥| Equipe Responsável
 
-**Projeto Social Brasilis - Turma E1_2**
+Projeto Social Brasilis - Turma E1_2
 
 ```
-* **Rubens Pinto**
-* **João Paulo**
-* **Antonio Franklin**
-* **Ana Cassia**
-* **Gideão Ferreira**
-* **Pedro Henrique**
+* Rubens Pinto
+* João Paulo
+* Antonio Franklin
+* Ana Cassia
+* Gideão Ferreira
+* Pedro Henrique
 ```
 ---
 
