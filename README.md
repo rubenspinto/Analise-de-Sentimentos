@@ -13,7 +13,7 @@ Este projeto é uma ferramenta de Processamento de Linguagem Natural (NLP) desen
 ## 📋| Funcionalidades
 
 ```
-* Upload de Planilhas: Interface web simples para envio de arquivos `.xlsx`.
+* Upload de Planilhas: Interface web simples para envio de arquivos `.xlsx, e ods`.
 * Classificação Automática: Processamento em lote de comentários utilizando Deep Learning.
 * Exportação de Resultados: Gera uma cópia da planilha original com uma nova coluna de sentimentos classificados.
 * Alta Precisão: Modelo otimizado para a língua portuguesa (PT-BR) e linguagem informal/redes sociais.
